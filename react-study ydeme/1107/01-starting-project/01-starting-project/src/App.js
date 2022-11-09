@@ -15,12 +15,12 @@ function App() {
     });
   };
   return (
-    <div>
+    <>
       <Suspense fallback={<h1>Lodding...</h1>}>
         <AddUser onAddUser={addUserHandler} />
         <UsersList users={userList} />
       </Suspense>
-    </div>
+    </>
   );
 }
 
