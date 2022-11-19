@@ -4,13 +4,14 @@ import useHttp from "../../hooks/use-http";
 const NewTask = (props) => {
   const { isLoading, error, sendRequest: sendTaskRequest } = useHttp();
 
-  const enterTaskHandler = async (taskText) => {
-    const createdTask = (taskData) => {
-      const generatedId = taskData.name; // firebase-specific => "name" contains generated id
-      const createdTask = { id: generatedId, text: taskText };
+  const createdTask = (taskText,taskData) => {
+    const generatedId = taskData.name; // firebase-specific => "name" contains generated id
+    const createdTask = { id: generatedId, text: taskText };
 
-      props.onAddTask(createdTask);
-    };
+    props.onAddTask(createdTask);
+  };
+
+  const enterTaskHandler = async (taskText) => {
     sendTaskRequest(
       {
         url: "https://react-http-db0e4-default-rtdb.firebaseio.com/tasks.json",
@@ -20,7 +21,7 @@ const NewTask = (props) => {
         },
         body: { text: taskText },
       },
-      createdTask
+      createdTask.bind(null, taskText)
     );
   };
 
