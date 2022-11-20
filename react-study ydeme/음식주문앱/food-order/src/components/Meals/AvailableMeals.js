@@ -1,35 +1,61 @@
+import { useEffect, useState } from "react";
+
 import Card from "../UI/Card";
 import MealsItem from "./MealItem/MealItem";
 import classes from "./AvailableMeals.module.css";
 
-const fooddata = [
-  {
-    id: "m1",
-    name: "회초밥",
-    description: "Finest fish and veggies",
-    price: 24000,
-  },
-  {
-    id: "m2",
-    name: "피자",
-    description: "A german specialty!",
-    price: 19000,
-  },
-  {
-    id: "m3",
-    name: "수제버거",
-    description: "American, raw, meaty",
-    price: 18000,
-  },
-  {
-    id: "m4",
-    name: "샐러드",
-    description: "Healthy...and green...",
-    price: 15000,
-  },
-];
 const AvailableMeals = () => {
-  const mealsList = fooddata.map((meal) => (
+  const [meals, setMeals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [httpError, setHttpError] = useState();
+
+  useEffect(() => {
+    const fetchMeals = async () => {
+      const response = await fetch(
+        "https://react-http-db0e4-default-rtdb.firebaseio.com/foodorderapp/meals.json"
+      );
+
+      if (!response.ok) {
+        throw new Error("문제가 발생했습니다.");
+      }
+      const responseData = await response.json();
+
+      const loadedMeals = [];
+
+      for (const key in responseData) {
+        loadedMeals.push({
+          id: key,
+          name: responseData[key].name,
+          description: responseData[key].description,
+          price: responseData[key].price,
+        });
+      }
+      setMeals(loadedMeals);
+      setIsLoading(false);
+    };
+
+    fetchMeals().catch((error) => {
+      setIsLoading(false);
+      setHttpError(error.message);
+    });
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section>
+        <p className={classes.MealsLoading}>Looding....</p>
+      </section>
+    );
+  }
+  if (httpError) {
+    return (
+      <section>
+        <p className={classes.MealsError}>{httpError}</p>
+      </section>
+    );
+  }
+
+  const mealsList = meals.map((meal) => (
     <MealsItem
       id={meal.id}
       key={meal.id}
